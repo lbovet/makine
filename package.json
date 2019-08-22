@@ -1,0 +1,33 @@
+{
+  "name": "makine",
+  "version": "1.0.0-rc.1",
+  "description": "Basis for an HTTP event-driven machine, typically useful for CI/CD triggers.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lbovet/makine.git"
+  },
+  "keywords": [
+    "event",
+    "machine",
+    "cicd"
+  ],
+  "author": "Laurent Bovet <laurent.bovet@windmaster.ch>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/lbovet/makine/issues"
+  },
+  "homepage": "https://github.com/lbovet/makine#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "request": "^2.88.0",
+    "rxjs": "^6.5.2"
+  },
+  "devDependencies": {
+    "mocha": "^6.2.0",
+    "nodemon": "^1.19.1"
+  }
+}
