@@ -8,7 +8,8 @@ const makine = require('../src/index');
 const baseUrl = 'http://localhost:7777';
 const get = (path, opts) => util.promisify(request.get)(`${baseUrl}${path}`, opts);
 const post = (path, opts) => util.promisify(request.post)(`${baseUrl}${path}`, opts);
-const server = makine(express());
+const app = express();
+const server = makine(app);
 const onGetRoot = server.on('GET', '/');
 
 describe('Server', () => {
@@ -23,7 +24,7 @@ describe('Server', () => {
                 assert.equal(statusCode, 404);
               })
               .then(() => get('/', { timeout: 50 }))
-              .catch(({ code }) => assert.equal(code, 'ETIMEDOUT'))
+              .catch(({ code }) => assert(code == 'ETIMEDOUT' || code == 'ECONNREFUSED'))
               .finally(done)
           )
       )
@@ -34,8 +35,10 @@ describe('Server', () => {
       after(() => server.stop())
 
       describe('.on()', () => {
-        it('should receive a request', done =>
-        onGetRoot(tap(() => done())).subscribe(), get('/', { timeout: 50 }).then(null,()=>{}))
+        it('should receive a request', done => {
+          onGetRoot(tap(() => done())).subscribe();
+          get('/', { timeout: 50 }).then(null,()=>{})
+        })        
       })
     })
 })
