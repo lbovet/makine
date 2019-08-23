@@ -4,18 +4,18 @@ const { flatMap, map, mapTo, catchError, pluck, repeat, skip, tap } = require('r
 const request = require('request');
 
 module.exports = (app) => {
+  var server;
   app = app || express();
   app.use(express.json({ type: '*/*' }))
 
   const start = (port = 3000, message) => {
     const subject = new Subject();
-    var server;
     server = app.listen(port, () => {
       if (message !== null) {
         console.log(message || `Listening on port ${port}.`);
       }
-      subject.next(server)
-      subject.complete()
+      subject.next(server);
+      subject.complete();
     });
     return subject;
   }
@@ -83,6 +83,7 @@ module.exports = (app) => {
       merge(start(port).pipe(skip(1)), ...pipeline).pipe(
         catchError((err, caught) => (console.error(err), caught))
       ),
-    start
+    start,
+    stop : () => server.close()
   }
 };

@@ -1,21 +1,41 @@
 const { of } = require('rxjs');
-const { flatMap, map, pluck } = require('rxjs/operators');
+const { flatMap, map, pluck, tap } = require('rxjs/operators');
+const util = require('util');
 const assert = require('assert');
 const express = require('express');
 const request = require('request');
+const makine = require('../src/index');
+const baseUrl = 'http://localhost:7777';
+const get = (path, opts) => util.promisify(request.get)(`${baseUrl}${path}`, opts);
+const post = (path, opts) => util.promisify(request.post)(`${baseUrl}${path}`, opts);
+const server = makine(express());
+const onGetRoot = server.on('GET', '/');
 
-describe('Server', () =>
-  describe('#start()', () =>
-    it('should start listening', done =>
-      require('../src/index')(express())
-        .start(7777).subscribe( server =>
-          request
-            .get('http://localhost:7777/', (err, res) => {
-              server.close();
-              assert.equal(res.statusCode, 404);
-              done();
-            })
-        )
+describe('Server', () => {
+  describe('Base', () =>
+    describe('.start()', () =>
+      it('should start and stop listening', done =>
+        server
+          .start(7777, null).subscribe(() =>
+            get('/nowhere', { timeout: 50 })
+              .then(({ statusCode }) => {
+                server.stop();
+                assert.equal(statusCode, 404);
+              })
+              .then(() => get('/', { timeout: 50 }))
+              .catch(({ code }) => assert.equal(code, 'ETIMEDOUT'))
+              .finally(done)
+          )
+      )
     )
-  )
-)
+  ),
+    describe('Request Handling', () => {
+      before(done => server.start(7777, null).subscribe(() => done()))
+      after(() => server.stop())
+
+      describe('.on()', () => {
+        it('should receive a request', done =>
+        onGetRoot(tap(() => done())).subscribe(), get('/', { timeout: 50 }).then(null,()=>{}))
+      })
+    })
+})
