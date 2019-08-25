@@ -8,7 +8,12 @@ module.exports = (app) => {
   app = app || express();
   app.use(express.json({ type: '*/*' }))
 
-  const start = (port = 3000, message) => {
+  /**
+   * Starts the engine
+   * @param {number} port. Where to listen to. Defaults to 3000. 
+   * @param {string} message . The message to output when listening.
+   */
+  function start(port = 3000, message) {
     const subject = new Subject();
     server = app.listen(port, () => {
       if (message !== null) {
@@ -73,8 +78,8 @@ module.exports = (app) => {
               mapTo(request)))),
     response: {
       empty: (status) => () => of({ status }),
-      body: (static) =>
-        static ? () => of({ body: static }) :
+      body: (constant) =>
+        constant ? () => of({ body: constant }) :
           body => of({ body })
     },
     serve: (port) => (...pipeline) =>
