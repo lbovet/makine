@@ -1,5 +1,6 @@
 # makine
 <a href="https://travis-ci.org/lbovet/makine"><img src="https://travis-ci.org/lbovet/makine.svg?branch=master"></a>
+<a href="https://www.npmjs.com/package/makine"><img src="https://img.shields.io/npm/v/makine"></a>
 
 Basis for a reactive HTTP event-driven machine, typically useful for CI/CD triggers.
 
