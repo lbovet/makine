@@ -29,13 +29,11 @@ module.exports = (app) => {
   return {
     on: (method, url) => (...pipeline) => {
       const subject = new Subject();
-      app[method.toLowerCase()](url, (request, response) => {
-        subject.next({ request, response })
-      });
+      app[method.toLowerCase()](url, (request) =>
+        subject.next(request));
       return subject.pipe(...pipeline, repeat());
     },
     extract: {
-      request: () => pluck('request'),
       body: prop => prop ? pipe(pluck('body'), pluck(prop)) : pluck('body'),
       url: () => pluck('url'),
       params: param => param ? pipe(pluck('params'), pluck(param)) : pluck('params')
@@ -44,7 +42,7 @@ module.exports = (app) => {
       perform: (method, url, opts) =>
         source =>
           source.pipe(
-            map(options => Object.assign({ json: true }, { method, url }, opts || options)),
+            map(options => Object.assign({ json: true }, options, opts, { method, url})),
             flatMap(options => bindCallback(request)(options)),
             flatMap(response =>
               !Array.isArray(response) ? throwError(response) :
@@ -59,25 +57,25 @@ module.exports = (app) => {
       onError: (pattern, body) =>
         onErrorMap(pattern, () => of(body))
     },
-    reply: project =>
+    reply: (project = (x => of(x))) =>
       source =>
         source.pipe(
-          flatMap(exchange =>
-            of(exchange.request).pipe(
+          flatMap(request =>
+            of(request).pipe(
               flatMap(project),
               tap(response =>
-                exchange.response
-                  .status(response.status)
+                request.res
+                  .status(response.status || 200)
                   .json(response.body)),
               catchError(err =>
-                (exchange.response.status(500).send(),
+                (request.res.status(500).send(),
                   throwError(err))),
-              mapTo(exchange.request)))),
+              mapTo(request)))),
     response: {
-      empty: (status = 200) => () => of({ status }),
+      empty: (status) => () => of({ status }),
       body: (static) =>
-        static ? () => of({ status: 200, body: static }) :
-          body => of({ status: 200, body })
+        static ? () => of({ body: static }) :
+          body => of({ body })
     },
     serve: (port) => (...pipeline) =>
       merge(start(port).pipe(skip(1)), ...pipeline).pipe(

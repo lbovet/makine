@@ -1,6 +1,6 @@
 {
   "name": "makine",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0",
   "description": "Basis for an HTTP event-driven machine, typically useful for CI/CD triggers.",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,8 @@
     "url": "git+https://github.com/lbovet/makine.git"
   },
   "keywords": [
-    "event",
+    "event-driven",
+    "http",
     "machine",
     "cicd"
   ],
@@ -27,7 +28,6 @@
     "rxjs": "^6.5.2"
   },
   "devDependencies": {
-    "mocha": "^6.2.0",
-    "nodemon": "^1.19.1"
+    "mocha": "^6.2.0"
   }
 }
