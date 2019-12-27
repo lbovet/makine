@@ -8,12 +8,7 @@ module.exports = (app) => {
   app = app || express();
   app.use(express.json({ type: '*/*' }))
 
-  /**
-   * Starts the engine
-   * @param {number} port. Where to listen to. Defaults to 3000. 
-   * @param {string} message . The message to output when listening.
-   */
-  function start(port = 3000, message) {
+  const start = (port = 3000, message) => {
     const subject = new Subject();
     server = app.listen(port, () => {
       if (message !== null) {
